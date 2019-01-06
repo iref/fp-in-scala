@@ -2,7 +2,7 @@ package fpinscala.ch02
 
 import fpinscala.AbstractSpec
 
-class ExerciseSpec extends AbstractSpec {
+class Chapter2Spec extends AbstractSpec {
 
   "fib" should "correctly compute nth fibonacci number" in {
     Chapter2.fib(5) should be(5)

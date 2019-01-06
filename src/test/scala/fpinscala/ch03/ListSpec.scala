@@ -2,7 +2,7 @@ package fpinscala.ch03
 
 import fpinscala.AbstractSpec
 
-class Exercise03Spec extends AbstractSpec {
+class ListSpec extends AbstractSpec {
 
   "tail" should "remove first element from the list" in {
     val xs = List(1, 2, 3, 4, 5)
