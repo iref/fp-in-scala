@@ -34,7 +34,34 @@ sealed trait List[+A] {
     case Cons(x, Nil) => Nil 
     case Cons(x, xs) => Cons(x, xs.init)
   }
+
+  def foldRight[B](acc: B)(f: (A, B) => B): B =
+    this match {
+      case Nil => acc
+      case Cons(x, xs) => f(x, xs.foldRight(acc)(f))
+    }
+
+  // Exercise 3.9
+  def length: Int = this.foldRight(0)((_, acc) => acc + 1)
+
+  // Exercise 3.10
+  // foldRight is not tail-recursive because first we have to find last
+  // element of list and apply reducer function to it and zero value
+  // and than we call reducer on result and element before last element,
+  // therefor recursive call is not last call.
+  def foldLeft[B](acc: B)(f: (B, A) => B): B = {
+    def step(xs: List[A], acc: B): B = xs match {
+      case Nil => acc
+      case Cons(x, xs) => xs.foldLeft(f(acc, x))(f)
+    }
+    step(this, acc)
+  }
+
+  // Exercise 3.12
+  def reverse: List[A] =
+    this.foldLeft(Nil: List[A])((acc, x) => Cons(x, acc))
 }
+
 final case object Nil extends List[Nothing]
 final case class Cons[+A](x: A, xs: List[A]) extends List[A]
 
@@ -62,4 +89,8 @@ object List {
   def drop[A](xs: List[A], n: Int): List[A] = xs.drop(n)
   def dropWhile[A](xs: List[A], predicate: A => Boolean): List[A] = xs.dropWhile(predicate)
   def init[A](xs: List[A]): List[A] = xs.init
+  def foldRight[A, B](xs: List[A], acc: B)(f: (A, B) => B): B = xs.foldRight(acc)(f)
+  def length[A](xs: List[A]): Int = xs.length
+  def foldLeft[A, B](xs: List[A], acc: B)(f: (B, A) => B): B = xs.foldLeft(acc)(f)
+  def reverse[A](xs: List[A]): List[A] = xs.reverse
 }
