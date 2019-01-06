@@ -59,7 +59,44 @@ sealed trait List[+A] {
 
   // Exercise 3.12
   def reverse: List[A] =
-    this.foldLeft(Nil: List[A])((acc, x) => Cons(x, acc))
+    foldLeft(Nil: List[A])((acc, x) => Cons(x, acc))
+
+  // Exercise 3.14
+  def append[AA >: A](value: AA): List[AA] =
+    foldRight(Cons(value, Nil))(Cons.apply)
+
+  // Exercise 3.18
+  def map[B](f: A => B): List[B] =
+    foldRight(Nil: List[B])((a, acc) => Cons(f(a), acc))
+
+  // Exercise 3.19
+  def filter(f: A => Boolean): List[A] =
+    foldRight(Nil: List[A]) { (a, acc) =>
+      if (f(a)) {
+        Cons(a, acc)
+      } else {
+        acc
+      }
+    }
+
+  // Exercise 3.20
+  //
+  // We can make this more efficient if we map and
+  // concat elements in same foldRight call
+  def flatMap[B](f: A => List[B]): List[B] =
+    List.concat(map(f))
+
+  def flatMap2[B](f: A => List[B]): List[B] =
+    foldRight(Nil: List[B]) { (a, acc) => 
+      val bs = f(a)
+      bs.foldRight(acc)((b, acc) => Cons(b, acc))
+    }
+
+  def zipWith[B, C](bs: List[B])(f: (A, B) => C): List[C] =
+    (this, bs) match {
+      case (Cons(a, ass), Cons(b, bss)) => Cons(f(a, b), ass.zipWith(bss)(f))
+      case _ => Nil
+    }
 }
 
 final case object Nil extends List[Nothing]
@@ -93,4 +130,21 @@ object List {
   def length[A](xs: List[A]): Int = xs.length
   def foldLeft[A, B](xs: List[A], acc: B)(f: (B, A) => B): B = xs.foldLeft(acc)(f)
   def reverse[A](xs: List[A]): List[A] = xs.reverse
+  def append[A](xs: List[A], value: A): List[A] = xs.append(value)
+  def map[A, B](xs: List[A])(f: A => B): List[B] = xs.map(f)
+  def filter[A](xs: List[A])(f: A => Boolean): List[A] = xs.filter(f)
+  def flatMap[A, B](xs: List[A])(f: A => List[B]): List[B] = xs.flatMap(f)
+
+  // Exercise 3.15
+  def concat[A](lists: List[List[A]]): List[A] =
+    lists.foldRight(Nil: List[A]) { (as, acc) =>
+      as.foldRight(acc)(Cons.apply)
+    }
+
+  // Exercise 3.23
+  def zipWith[A, B, C](as: List[A], bs: List[B])(f: (A, B) => C): List[C] =
+    (as, bs) match {
+      case (Cons(a, ass), Cons(b, bss)) => Cons(f(a, b), zipWith(ass, bss)(f))
+      case _ => Nil
+    }
 }

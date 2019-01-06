@@ -98,4 +98,53 @@ class ListSpec extends AbstractSpec {
   it should "return empty list if original list is empty" in {
     Nil.reverse should be(Nil)
   }
+
+  "append" should "add element to add of the list" in {
+    val ints = List(1, 2, 3, 4)
+    ints.append(5) should be (List(1, 2, 3, 4, 5))
+  }
+
+  it should "return single element list if list was empty" in {
+    Nil.append("a") should be(List("a"))
+  }
+
+  "concat" should "concatenate all lists" in {
+    val lists = List(
+      List(1, 2, 3, 4),
+      List(5, 6, 7, 8),
+      List(9, 10, 11, 12),
+      List(13, 14, 15, 16),
+    )
+
+    val expected = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+
+    List.concat(lists) should be(expected)
+  }
+
+  "map" should "apply function to each element of list" in {
+    val ints = List(1, 2, 3, 4)
+
+    ints.map(a => a % 2 == 0) should be(List(false, true, false, true))
+  }
+
+  "filter" should "remove all elements that don't satisfy predicate" in {
+    val ints = List(1, 2, 3, 4)
+
+    ints.filter(a => a % 2 == 0) should be(List(2, 4))
+  }
+
+  "flatMap" should "apply function on each element and flatten result to one list" in {
+    val ints = List(1, 2, 3, 4)
+    val actual = ints.flatMap(a => List(a, a + 1, a + 2))
+
+    actual should be(List(1, 2, 3, 2, 3, 4, 3, 4, 5, 4, 5, 6))
+  }
+
+  "zipWith" should "apply function to elements same positions in list" in {
+    val ints = List(1, 2, 3, 4)
+    val strings = List("a", "b", "c", "d")
+
+    val actual = List.zipWith(ints, strings)((i, s) => s * i)
+    actual should be (List("a", "bb", "ccc", "dddd"))
+  }
 }
