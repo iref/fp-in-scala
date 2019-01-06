@@ -71,4 +71,31 @@ class Exercise03Spec extends AbstractSpec {
     val xs = List[Int]()
     xs.init should be(Nil)
   }
+
+  "length" should "return correct length of non-empty list" in {
+    val xs = List(1, 2, 3, 4)
+    xs.length should be(4)
+  }
+
+  it should "return lenght zero if list is empty" in {
+    Nil.length should be(0)
+  }
+
+  "foldLeft" should "apply accumulator from left to right" in {
+    val ints = List(1, 2, 3, 4)
+
+    val actual = ints.foldLeft(0)(_ - _)
+
+    actual should be(-10)
+  }
+
+  "reverse" should "return reversed list" in {
+    val ints = List(1, 2, 3, 4)
+
+    ints.reverse should be(List(4, 3, 2, 1))
+  }
+
+  it should "return empty list if original list is empty" in {
+    Nil.reverse should be(Nil)
+  }
 }
