@@ -35,22 +35,22 @@ object Tree {
     }
 
   // Exercise 3.29
-  def fold[A, B](tree: Tree[A])(zero: A => B, branch: (B, B) => B): B =
+  def fold[A, B](tree: Tree[A])(mapper: A => B)(reducer: (B, B) => B): B =
     tree match {
-      case Leaf(a) => zero(a)
-      case Branch(left, right) => branch(fold(left)(zero, branch), fold(right)(zero, branch))
+      case Leaf(a) => mapper(a)
+      case Branch(left, right) => reducer(fold(left)(mapper)(reducer), fold(right)(mapper)(reducer))
     }
 
   def size2[A](tree: Tree[A]): Int =
-    fold[A, Int](tree)(_ => 1, (l, r) => 1 + l + r)
+    fold(tree)(_ => 1)((l, r) => 1 + l + r)
 
   def maximum2(tree: Tree[Int]): Int =
-    fold[Int, Int](tree)(a => a, (l, r) => l.max(r))
+    fold(tree)(a => a)((l, r) => l.max(r))
 
   def depth2[A](tree: Tree[A]): Int =
-    fold[A, Int](tree)(_ => 0, (l, r) => 1 + l.max(r))
+    fold(tree)(_ => 0)((l, r) => 1 + l.max(r))
 
   def map2[A, B](tree: Tree[A])(f: A => B): Tree[B] =
-    fold[A, Tree[B]](tree)(a => Leaf(f(a)), (l, r) => Branch(l, r))
+    fold(tree)(a => Leaf(f(a)): Tree[B])((l, r) => Branch(l, r))
 
 }
