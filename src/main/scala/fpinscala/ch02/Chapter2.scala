@@ -13,11 +13,11 @@ object Chapter2 {
 
     // This can be handled without exception using functional error handling types
     // see Chapter 4
-    if (n < 0) {
+    if (n <= 0) {
       throw new IllegalArgumentException("n must be nonnegative integer")
     }
 
-    go(0, 1, n)
+    go(0, 1, n - 1)
   }
 
   def isSorted[A](as: Array[A], ordered: (A, A) => Boolean): Boolean = {

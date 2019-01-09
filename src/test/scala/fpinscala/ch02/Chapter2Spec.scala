@@ -5,10 +5,11 @@ import fpinscala.AbstractSpec
 class Chapter2Spec extends AbstractSpec {
 
   "fib" should "correctly compute nth fibonacci number" in {
-    Chapter2.fib(5) should be(5)
-    Chapter2.fib(0) should be(0)
-    Chapter2.fib(1) should be(1)
-    Chapter2.fib(10) should be(55)
+    Chapter2.fib(4) should be(2)
+    Chapter2.fib(5) should be(3)
+    Chapter2.fib(1) should be(0)
+    Chapter2.fib(2) should be(1)
+    Chapter2.fib(10) should be(34)
   }
 
   it should "throw exception if n is negative integer" in {
