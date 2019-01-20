@@ -6,7 +6,7 @@ object Chapter4 {
     if (xs.isEmpty) None else Some(xs.sum / xs.length)
 
   def variance(xs: Seq[Double]): Option[Double] =
-    mean(xs).flatMap { m => 
+    mean(xs).flatMap { m =>
       val xsVariances = xs.map(x => math.pow(x - m, 2))
       mean(xsVariances)
     }
@@ -20,7 +20,7 @@ object Chapter4 {
   def safeDiv(x: Int, y: Int): Either[Exception, Int] =
     try
       Right(x / y)
-    catch { 
+    catch {
       case e: Exception => Left(e)
     }
 

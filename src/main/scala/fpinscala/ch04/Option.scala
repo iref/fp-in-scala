@@ -45,7 +45,7 @@ object Option {
 
   // Exercise 4.4
   def sequence[A](as: List[Option[A]]): Option[List[A]] =
-    as.foldRight(Some(Nil): Option[List[A]]){(ao, acc) => 
+    as.foldRight(Some(Nil): Option[List[A]]){(ao, acc) =>
       acc.flatMap(l => ao.map(a => a :: l))
     }
 
