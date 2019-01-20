@@ -31,7 +31,7 @@ sealed trait List[+A] {
   // Maybe we should throw exception for empty list??
   def init[AA >: A]: List[AA] = this match {
     case Nil => Nil
-    case Cons(x, Nil) => Nil 
+    case Cons(x, Nil) => Nil
     case Cons(x, xs) => Cons(x, xs.init)
   }
 
@@ -87,7 +87,7 @@ sealed trait List[+A] {
     List.concat(map(f))
 
   def flatMap2[B](f: A => List[B]): List[B] =
-    foldRight(Nil: List[B]) { (a, acc) => 
+    foldRight(Nil: List[B]) { (a, acc) =>
       val bs = f(a)
       bs.foldRight(acc)((b, acc) => Cons(b, acc))
     }

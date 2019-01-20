@@ -17,7 +17,7 @@ object Chapter3 {
 
   // Exercise 3.7
   // We don't have abstract way of defining when to stop while folding.
-  // We can extend foldRight to take additional function (shouldStop) or 
+  // We can extend foldRight to take additional function (shouldStop) or
   // return different type from reducer function to indicate if we should
   // continue to traverse list or we should stop
   // def foldRight[A, B](xs: List[A], z: B)(f: (A, B) => B, stop: B => Boolean): B
