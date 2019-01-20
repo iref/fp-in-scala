@@ -37,7 +37,7 @@ class OptionSpec extends AbstractSpec {
   }
 
   it should "return default value if value is missing" in {
-    None.orElse(Some(1)) should be(Some(1)) 
+    None.orElse(Some(1)) should be(Some(1))
   }
 
   "filter" should "return original value if it's accepted by predicate" in {
@@ -80,7 +80,7 @@ class OptionSpec extends AbstractSpec {
 
   "traverse" should "return list of values if all are present" in {
     val l = List("a", "ab", "abc", "abcd")
-    val result = Option.traverse(l) { a => 
+    val result = Option.traverse(l) { a =>
       Some(a).filter(a => a.length > 0).map(_.length)
     }
     
@@ -89,7 +89,7 @@ class OptionSpec extends AbstractSpec {
 
   it should "return None if at least one value is missing" in {
     val l = List(1, 2, 3, 4)
-    val result = Option.traverse(l) { a => 
+    val result = Option.traverse(l) { a =>
       Some(a).filter(a => a % 2 == 0)
     }
     
