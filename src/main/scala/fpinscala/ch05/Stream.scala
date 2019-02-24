@@ -38,13 +38,13 @@ sealed trait Stream[+A] {
       case Empty => z
     }
 
-  def existWithFoldRight(p: A => Boolean): Boolean =
+  def exist_foldRight(p: A => Boolean): Boolean =
     foldRight(false)((a, b) => p(a) || b)
 
   def forAll(p: A => Boolean): Boolean =
     foldRight(true)((a, b) => p(a) && b)
 
-  def takeWhileWithFoldRight(f: A => Boolean): Stream[A] =
+  def takeWhile_foldRight(f: A => Boolean): Stream[A] =
     foldRight(Stream.empty[A]) { (a, b) =>
       if (f(a)) Stream.cons(a, b) else Stream.empty
     }
@@ -138,11 +138,10 @@ sealed trait Stream[+A] {
       }
     } append Stream(Stream.empty)
 
-  /*
-  def scanRight[B](z: B)(f: (A, B) => B): Stream[B] =
+  /* def scanRight[B](z: B)(f: (A, B) => B): Stream[B] =
     Stream.unfold(this) { s =>
       s match {
-        case Cons(h, t) => Some((s, t()))
+        case Cons(h, t) => Some((t, f(h, t())))
         case Empty => None
       }
     } append Stream(z)
@@ -193,14 +192,9 @@ object Stream {
   def from_unfold(n: Int): Stream[Int] =
     unfold(n)(n => Some((n, n+1)))
 
-  def fibs_unfold: Stream[Long] = {
-    def go(f1: Long, f2: Long): Stream[Long] =
-      unfold((f1, f2)) { case (a, b) =>
-        Some((a, (b, a+1)))
-      }
-
-    go(0, 1)
-  }
-
+  def fibs_unfold: Stream[Long] =
+    unfold((0, 1)) { case (a, b) =>
+      Some((a, (b, a+1)))
+    }
 }
 
