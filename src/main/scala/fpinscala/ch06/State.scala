@@ -55,11 +55,11 @@ object CandyDispenser {
       case (Machine(true, _, _), Turn) => machine
       case (Machine(false, _, _), Coin) => machine
       case (Machine(_, 0, _), _) => machine
-      case (Machine(true, candies, coins), Coin) => Machine(false, candies, coins + 1) 
+      case (Machine(true, candies, coins), Coin) => Machine(false, candies, coins + 1)
       case (Machine(false, candies, coins), Turn) => Machine(true, candies - 1, coins)
     }
 
-  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = 
+  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] =
     for {
       _ <- State.sequence(
         inputs.map(input =>

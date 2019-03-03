@@ -16,7 +16,7 @@ class RNGSpec extends AbstractSpec {
   "nonNegativeInt" should "always return positive integer" in {
     forAll { seed: Long =>
       val rng = SimpleRNG(seed)
-      val (i, _) = RNG.nonNegativeInt(rng) 
+      val (i, _) = RNG.nonNegativeInt(rng)
       i should be >= 0
     }
   }

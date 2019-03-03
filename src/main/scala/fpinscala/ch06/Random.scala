@@ -60,7 +60,7 @@ object Random {
       f(a)(rng2)
     }
 
-  def nonNegativeLessThan(n: Int): Random[Int] = 
+  def nonNegativeLessThan(n: Int): Random[Int] =
     flatMap(Random.nonNegativeInt) { i =>
       val mod = i % n
       if (i + (n - 1) - mod >= 0) {

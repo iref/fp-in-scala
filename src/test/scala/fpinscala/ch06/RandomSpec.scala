@@ -16,7 +16,7 @@ class RandomSpec extends AbstractSpec {
   "nonNegativeEven" should "always return positive integer" in {
     forAll { seed: Long =>
       val rng = SimpleRNG(seed)
-      val (i, _) = Random.nonNegativeEven(rng) 
+      val (i, _) = Random.nonNegativeEven(rng)
       i should be >= 0
       (i % 2) should be(0)
     }
