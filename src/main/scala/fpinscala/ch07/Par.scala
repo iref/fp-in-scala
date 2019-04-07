@@ -59,6 +59,99 @@ object Par {
         map(sequence(filterPars))(_.flatten)
     }
 
+    // Exercise 7.7
+
+    // Simplification
+    //
+    // map(unit(x))(f) == unit(x)(f)
+    // map(unit(x))(id) == unit(id(x))
+    // map(unit(x))(id) == unit(x)
+    // map(y)(id) == y
+    //
+    //
+    // map(map(y)(g))(f) == map(y)(f compose g)
+    // map(map(y)(g))(f) == 
+
+    // Exercise 7.8
+    //
+    // If we choose Executors.newSingleThreadExecutor()
+    // and use fork(fork(unit(1)))...
+    // es => es.submit(new Callable[A] {
+    //        def call: A = fork(unit(1))(es).get
+    //    })
+    // This starts new task in our single thread, that tries to submit
+    // new task (fork(unit(1))) in same thread pool, but Executor
+    // doesn't have free thread to assign to the second task.
+    // Second task waits on first task to finish, so it can receive thread
+    // from thread pool. First task waits on second task to finish, so it 
+    // can release thread back to thread pool => deadlock
+
+    // Exercise 7.9
+    //
+    // For fixed executor service of size N.
+    //
+    // val tasks = (0..N).toList
+    // val computation = tasks.foldLeft(lazyUnit(1)) { (acc, _) =>
+    //    fork(task)
+    // }
+    // This code spawns N+1 nested computations, which means that there is always
+    // at least one computation that has to wait for free thread while first N
+    // computations wait on it to finish => deadlock
+
+    def delay[A](fa: => Par[A]): Par[A] =
+        Par(es => fa.run(es))
+
+    def choice[A](cond: Par[Boolean])(t: Par[A], f: Par[A]): Par[A] =
+        Par(es => 
+            if (cond.run(es).get) {
+                t.run(es)
+            } else {
+                f.run(es)
+            }
+        )
+
+    // Exercise 7.11
+    def choiceN[A](n: Par[Int])(list: List[Par[A]]): Par[A] =
+        // Doesn't handle case when i is out of bounds
+        Par(es => {
+            val i = n.run(es).get
+            list(i).run(es)
+        })
+
+    // Exercise 7.12
+    def choiceMap[K, V](kPar: Par[K])(map: Map[K, Par[V]]): Par[V] =
+        Par(es => {
+            val k = kPar.run(es).get
+            map(k).run(es)
+        })
+
+    // Exercise 7.13
+    def flatMap[A, B](parA: Par[A])(f: A => Par[B]): Par[B] =
+        Par(es => {
+            val a = parA.run(es).get
+            f(a).run(es)
+        })
+
+    // Exercise 7.14
+    def join[A](par: Par[Par[A]]): Par[A] =
+        Par(es => par.run(es).get.run(es))
+
+    def flatMap_join[A, B](par: Par[A])(f: A => Par[B]): Par[B] = {
+        val mapped = Par.map(par)(f)
+        Par.join(mapped)
+    }
+
+    def join_flatMap[A](par: Par[Par[A]]): Par[A] =
+        flatMap(par)(parA => parA)
+
+    def choice_flatMap[A](cond: Par[Boolean])(t: Par[A], f: Par[A]): Par[A] =
+        flatMap(cond) { pred => if (pred) t else f }
+
+    def choiceN_flatMap[A](n: Par[Int])(list: List[Par[A]]): Par[A] =
+        flatMap(n) { i => list(i) }
+
+    def choiceMap_flatMap[K, V](kPar: Par[K])(map: Map[K, Par[V]]): Par[V] =
+        flatMap(kPar) { k => map(k) }
 
     private case class UnitFuture[A](get: A) extends Future[A] {
         def isDone: Boolean = true
