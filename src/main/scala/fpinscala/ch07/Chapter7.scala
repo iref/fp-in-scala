@@ -17,14 +17,14 @@ object Chapter7 {
             val (l, r) = ints.splitAt(ints.length / 2)
             // if unit immediatelly starts computation in different
             // thread, than sum is not parallel because get(sumL)
-            // blocks thread until sumL finishes and than 
+            // blocks thread until sumL finishes and than
             // blocks until get(sumR) finishes.
             //
             // we would like to start our computation and
-            // wait only for final result. 
+            // wait only for final result.
             // To do this, we need way to combine two Par's
             // into new one in non-blocking way.
-            val sumL = Par.unit(sum_par1(l)) 
+            val sumL = Par.unit(sum_par1(l))
             val sumR = Par.unit(sum_par1(r))
             Par.run(sumL) + Par.run(sumR)
         }
@@ -60,7 +60,7 @@ object Chapter7 {
      *   because unit is not lazy anymore and params, are evaluated before function body
      * 2b:
      *  ...
-     * 1b: 
+     * 1b:
      *  (l, r) = ([3], [4])
      *  map2(sum([3]), sum([4]))(_ + _)
      * 2c:

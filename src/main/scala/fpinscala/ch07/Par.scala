@@ -13,7 +13,7 @@ object Par {
     def run[A](es: ExecutorService)(par: Par[A]): Future[A] = par.run(es)
 
     // Exercise 7.1
-    def map2[A, B, C](parA: Par[A], parB: Par[B])(f: (A, B) => C) = 
+    def map2[A, B, C](parA: Par[A], parB: Par[B])(f: (A, B) => C) =
         Par(es => {
             val a = parA.run(es)
             val b = parB.run(es)
@@ -70,7 +70,7 @@ object Par {
     //
     //
     // map(map(y)(g))(f) == map(y)(f compose g)
-    // map(map(y)(g))(f) == 
+    // map(map(y)(g))(f) ==
 
     // Exercise 7.8
     //
@@ -83,7 +83,7 @@ object Par {
     // new task (fork(unit(1))) in same thread pool, but Executor
     // doesn't have free thread to assign to the second task.
     // Second task waits on first task to finish, so it can receive thread
-    // from thread pool. First task waits on second task to finish, so it 
+    // from thread pool. First task waits on second task to finish, so it
     // can release thread back to thread pool => deadlock
 
     // Exercise 7.9
@@ -102,7 +102,7 @@ object Par {
         Par(es => fa.run(es))
 
     def choice[A](cond: Par[Boolean])(t: Par[A], f: Par[A]): Par[A] =
-        Par(es => 
+        Par(es =>
             if (cond.run(es).get) {
                 t.run(es)
             } else {
@@ -162,7 +162,7 @@ object Par {
 
     // Exercise 7.3
     private case class Map2Future[A, B, C](
-        futureA: Future[A], 
+        futureA: Future[A],
         futureB: Future[B],
         f: (A, B) => C
     ) extends Future[C] {

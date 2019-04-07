@@ -65,7 +65,7 @@ class ParSpec extends AbstractSpec {
     }
 
     "map" should "obey mapping law: map(unit(x))(f) == unit(f(x))" in {
-        run { es => 
+        run { es =>
             val pa = Par.lazyUnit(2)
             val result = Par.map(pa) { a => a + 3 }
 

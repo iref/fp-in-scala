@@ -15,7 +15,7 @@ object Par {
 
         val latch = new CountDownLatch(1)
 
-        val onSuccess = (a: A) => { 
+        val onSuccess = (a: A) => {
             ref.set(Right(a))
             latch.countDown()
         }
@@ -31,12 +31,12 @@ object Par {
         ref.get
     }
 
-    def unit[A](value: A): Par[A] = 
+    def unit[A](value: A): Par[A] =
         _ => new Future[A] {
             def apply(cb: A => Unit, onError: Throwable => Unit): Unit = cb(value)
         }
 
-    def map2[A, B, C](parA: Par[A], parB: Par[B])(f: (A, B) => C): Par[C] = 
+    def map2[A, B, C](parA: Par[A], parB: Par[B])(f: (A, B) => C): Par[C] =
         es => new Future[C] {
             def apply(cb: C => Unit, onError: Throwable => Unit): Unit = {
                 var resultA: Option[A] = None
@@ -71,7 +71,7 @@ object Par {
 
     private def eval(es: ExecutorService)(r: => Unit, onError: Throwable => Unit): Unit =
         es.submit(new Callable[Unit] {
-            def call: Unit = 
+            def call: Unit =
                 try {
                     r
                 } catch {
