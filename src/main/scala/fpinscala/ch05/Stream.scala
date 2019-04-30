@@ -138,6 +138,12 @@ sealed trait Stream[+A] {
       }
     } append Stream(Stream.empty)
 
+  def find(f: A => Boolean): Option[A] =
+    this match {
+      case Cons(a, t) => if (f(a)) Some(a) else t.find(f)
+      case Empty = None
+    }
+
   /* def scanRight[B](z: B)(f: (A, B) => B): Stream[B] =
     Stream.unfold(this) { s =>
       s match {
