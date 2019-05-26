@@ -8,7 +8,7 @@ case class Prop(run: (Prop.MaxSize, Prop.TestCases, RNG) => Result) { self =>
     // Exercise 8.9
     def &&(other: Prop): Prop =
         Prop { case (max, tc, rng) =>
-            self.run(max, tc, rng) match {                
+            self.run(max, tc, rng) match {
                 case Falsified(fc, sc) => Falsified(fc, sc)
                 case _ => other.run(max, tc, rng)
             }
@@ -20,13 +20,13 @@ case class Prop(run: (Prop.MaxSize, Prop.TestCases, RNG) => Result) { self =>
                 case Falsified(fc, sc) => other.run(max, tc, rng)
                 case x => x
             }
-        }   
+        }
 }
 
 object Prop {
     type MaxSize = Int
     type SuccessCount = Int
-    type FailedCase = String    
+    type FailedCase = String
     type TestCases = Int
 
     def run(
@@ -39,18 +39,18 @@ object Prop {
             case Passed =>
                 println(s"+ OK, passed $testCases.")
             case Proved =>
-                println(s"+ OK, proved property.")
+                println("+ OK, proved property.")
             case Falsified(failedCase, successCount) =>
                 println(s"! Falsified after $successCount passed test:\n $failedCase")
         }
 
     def forAll[A](as: Gen[A])(f: A => Boolean) = Prop {
-        (n, tc, rng) => 
+        (n, tc, rng) =>
             randomStream(as)(rng)
                 .zip(Stream.from(0))
                 .take(n)
                 .map { case (a, i) =>
-                     runTest(i.toString, a, i)(f) 
+                     runTest(i.toString, a, i)(f)
                 }
                 .find(_.isFalsified)
                 .getOrElse(Passed)
@@ -69,7 +69,7 @@ object Prop {
                         .map(i => forAll(g(i))(f))
                 val prop: Prop =
                     props
-                        .map { p => 
+                        .map { p =>
                             Prop { (max, _, rng) =>
                                 p.run(max, casesPerSuite, rng)
                             }
@@ -91,7 +91,7 @@ object Prop {
     private def randomStream[A](gen: Gen[A])(rng: RNG): Stream[A] =
         Stream.unfold(rng)(rng => Some(gen.sample.run(rng)))
 
-    private def buildMsg[A](label: String, a: A, e: Exception): String =        
+    private def buildMsg[A](label: String, a: A, e: Exception): String =
         s"test case: $a\n" +
         s"generated an exception: ${e.getMessage}\n" +
         s"stack trace:\n ${e.getStackTrace.mkString("\n")}"
@@ -156,13 +156,13 @@ object Gen {
         Gen(State(RNG.nonNegativeInt).map(n => n % 2 == 0))
 
     def listOfN[A](n: Int, gen: Gen[A]): Gen[List[A]] =
-        Gen(State.sequence(List.fill(n)(gen.sample)))    
+        Gen(State.sequence(List.fill(n)(gen.sample)))
 
     // Exercise 8.7
     def union[A](gen1: Gen[A], gen2: Gen[A]): Gen[A] =
         Gen.boolean.flatMap { b =>
             if (b) gen1 else gen2
-        }    
+        }
 }
 
 case class SGen[A](forSize: Int => Gen[A]) {
@@ -172,7 +172,7 @@ case class SGen[A](forSize: Int => Gen[A]) {
         SGen(size => forSize(size).map(f))
 
     def flatMap[B](f: A => SGen[B]): SGen[B] =
-        SGen(size => forSize(size).flatMap(a => f(a).forSize(size)))    
+        SGen(size => forSize(size).flatMap(a => f(a).forSize(size)))
 }
 
 object SGen {
