@@ -45,11 +45,13 @@ object Prop {
         }
 
     def forAll[A](as: Gen[A])(f: A => Boolean) = Prop {
-        (_, tc, rng) => 
+        (n, tc, rng) => 
             randomStream(as)(rng)
                 .zip(Stream.from(0))
                 .take(n)
-                .map { case (a, i) => runTest(label, a, i) }
+                .map { case (a, i) =>
+                     runTest(i.toString, a, i)(f) 
+                }
                 .find(_.isFalsified)
                 .getOrElse(Passed)
     }
@@ -57,7 +59,7 @@ object Prop {
     def forAll[A](as: SGen[A])(f: A => Boolean): Prop =
         forAll(size => as(size))(f)
 
-    private forAll[A](g: Int => Gen[A])(f: A => Boolean): Prop =
+    private def forAll[A](g: Int => Gen[A])(f: A => Boolean): Prop =
         Prop {
             case (max, tc, rng) =>
                 val casesPerSuite = (tc + (max - 1)) / max
@@ -79,9 +81,9 @@ object Prop {
         }
 
     def label(label: String)(prop: Prop): Prop =
-        Prop { case (tc, rng) =>
-            prop.run(tc, rng) match {
-                case Falsified(tc, sc) => Falsified(s"$label\n$fc", sc)
+        Prop { case (maxSize, tc, rng) =>
+            prop.run(maxSize, tc, rng) match {
+                case Falsified(tc, sc) => Falsified(s"$label\n$tc", sc)
                 case r => r
             }
         }
@@ -94,9 +96,9 @@ object Prop {
         s"generated an exception: ${e.getMessage}\n" +
         s"stack trace:\n ${e.getStackTrace.mkString("\n")}"
 
-    private def runTest[A](label: String, a: A, i: Int): Result =
+    private def runTest[A](label: String, a: A, i: Int)(f: A => Boolean): Result =
         try {
-            if (f(a)) Passed else Falsified(s"$label: a.toString", i)
+            if (f(a)) Passed else Falsified(s"$label: ${a.toString}", i)
         } catch {
             case e: Exception => Falsified(buildMsg(label, a, e), i)
         }
@@ -120,7 +122,7 @@ case class Falsified(failure: Prop.FailedCase, successes: Prop.SuccessCount) ext
 
 case class Gen[A](sample: State[RNG, A]) {
 
-    def map[B](f: A => B): Gen[A] =
+    def map[B](f: A => B): Gen[B] =
         Gen(this.sample.map(f))
 
     // Exercise 8.6
@@ -144,41 +146,42 @@ object Gen {
 
     // Exercise 8.4
     def choose(start: Int, endInclusive: Int): Gen[Int] =
-        Gen(State(RNG.nonNegativeInt.map(n => start + n % (endInclusive - start))
+        Gen(State(RNG.nonNegativeInt).map(n => start + n % (endInclusive - start)))
 
     // Exercise 8.5
     def unit[A](a: => A): Gen[A] =
         Gen(State.unit(a))
 
     def boolean: Gen[Boolean] =
-        Gen(State(RNG.nonNegativeInt.map(n => n % 2 == 0)))
+        Gen(State(RNG.nonNegativeInt).map(n => n % 2 == 0))
 
     def listOfN[A](n: Int, gen: Gen[A]): Gen[List[A]] =
         Gen(State.sequence(List.fill(n)(gen.sample)))    
 
     // Exercise 8.7
     def union[A](gen1: Gen[A], gen2: Gen[A]): Gen[A] =
-        Gen.boolean.flatmap { b =>
+        Gen.boolean.flatMap { b =>
             if (b) gen1 else gen2
         }    
 }
 
 case class SGen[+A](forSize: Int => Gen[A]) {
+    def apply(size: Int): Gen[A] = forSize(size)
     // Exercise 8.11
     def map[B](f: A => B): SGen[B] =
         SGen(size => forSize(size).map(f))
 
-    def flatMap[B](f: A => SGen[B]): Gen[B] =
+    def flatMap[B](f: A => SGen[B]): SGen[B] =
         SGen(size => forSize(size).flatMap(a => f(a).forSize(size)))    
 }
 
 object SGen {
 
     // Exercise 8.12
-    def listOf[A](gen: A): SGen[A] =
+    def listOf[A](gen: Gen[A]): SGen[List[A]] =
         SGen(size => Gen.listOfN(size, gen))
 
     // Exercise 8.13
     def listOf1[A](g: Gen[A]): SGen[List[A]] =
-        SGen(n => g.listOfN(n max 1))
+        SGen(n => Gen.listOfN(n max 1, g))
 }
