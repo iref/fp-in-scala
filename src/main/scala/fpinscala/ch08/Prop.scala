@@ -163,6 +163,25 @@ object Gen {
         Gen.boolean.flatMap { b =>
             if (b) gen1 else gen2
         }
+
+    private val characters = ('A' to 'z').toIndexedSeq
+    val char: Gen[Char] =
+        Gen.choose(0, characters.size - 1).map { n =>
+            characters(n)
+        }
+
+    val string: Gen[String] =
+        for {
+            n <- choose(0, 100)
+            cs <- listOfN(n, char)
+        } yield cs.mkString("")
+    
+    val sentences: Gen[String] =
+        for {
+            n <- choose(0, 100)
+            words <- listOfN(n, string)
+        } yield words.mkString(" ")
+
 }
 
 case class SGen[A](forSize: Int => Gen[A]) {
